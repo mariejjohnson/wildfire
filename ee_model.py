@@ -13,7 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 from geopandas import GeoDataFrame
 from shapely.geometry import Point
 
-from ee_utils import get_world_climate
+from ee_utils import get_world_climate # Is this actually necessary? Will I use climate
 
 sys.path.insert(0, os.path.abspath('..'))
 abspath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -280,9 +280,13 @@ def stack_bands(yr, roi):
     ksat = ee.Image('users/dgketchum/soils/ssurgo_Ksat_WTA_0to152cm_composite').rename('ksat')
     sand = ee.Image('users/dgketchum/soils/ssurgo_Sand_WTA_0to152cm_composite').rename('sand')
 
+    gsw = ee.Image('JRC/GSW1_0/GlobalSurfaceWater')
+    occ_pos = gsw.select('occurrence').gt(0)
+    water = occ_pos.unmask(0).rename('gsw')
+
     gedi = ee.Image('users/potapovpeter/GEDI_V27/GEDI_NAM_v27')
 
-    input_bands = input_bands.addBands([awc, clay, ksat, sand, gedi])
+    input_bands = input_bands.addBands([awc, clay, ksat, sand, water, gedi])
     input_bands = input_bands.clip(roi)
     return input_bands
 
@@ -296,23 +300,25 @@ def is_authorized():
         print('You are not authorized: {}'.format(e))
         return False
 
-
+# I don't understand how the if __name__ etc operates, I understand it is pulling
+# functions from above - but I don't understand why you use: if __name__ == '__main__':
 if __name__ == '__main__':
     points = 'users/mariejohnson22/inference/random_points'
     years_ = [2019]
-    pref = 'bands_6JAN2023'
+    pref = 'bands_10JAN2023' # file prefix
     roi = 'users/mariejohnson22/inference/mission_no_fire'
-    # request_band_extract(pref, points, roi, years_)
+    request_band_extract(pref, points, roi, years_)
 
-    csv = '/home/marie/crazyHorse/gedi/extracts/bands_6JAN2023_2019.csv'
-    # random_forest(csv, show_importance=True)
+    # I THINK THIS IS THE MAIN AREA OF CONFUSION - HOW WAS THIS GENERATED - QGIS?
+    csv = '/home/marie/crazyHorse/gedi/extracts/bands_10JAN2023_2019.csv'
+    random_forest(csv, show_importance=True)
 
-    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_6JAN2023_2019.csv'
-    # prep_extracts(csv, out_csv)
+    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_10JAN2023_2019.csv'
+    prep_extracts(csv, out_csv)
 
     training_data = 'users/mariejohnson22/inference/training_data'
     image_coll = 'users/mariejohnson22/inference/canopy_height'
     clip = 'users/mariejohnson22/inference/mission_no_fire'
-    out_img = 'canopy_height_base'
+    out_img = 'canopy_height_base_10JAN2023'
     export_prediction(out_img, training_data, image_coll, clip, [2019])
 # ========================= EOF =================================================
