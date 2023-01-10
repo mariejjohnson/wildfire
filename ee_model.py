@@ -20,7 +20,7 @@ abspath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(abspath)
 
 
-def prep_extracts(c, out_c):
+def prep_extracts(c, out_c): # features, dropna
     print(os.path.basename(c))
     df = pd.read_csv(c)
     print(df.shape)
@@ -115,6 +115,7 @@ def export_prediction(out_name, table, asset_root, region, years,
 
     input_props = fc.first().propertyNames().remove('system:index')
     trained_model = classifier.train(fc, 'b1', input_props)
+    print()
 
     for yr in years:
         input_bands = stack_bands(yr, roi)
@@ -286,7 +287,7 @@ def stack_bands(yr, roi):
 
     gedi = ee.Image('users/potapovpeter/GEDI_V27/GEDI_NAM_v27')
 
-    input_bands = input_bands.addBands([awc, clay, ksat, sand, water, gedi])
+    input_bands = input_bands.addBands([awc, clay, ksat, sand, gedi])
     input_bands = input_bands.clip(roi)
     return input_bands
 
@@ -302,23 +303,35 @@ def is_authorized():
 
 # I don't understand how the if __name__ etc operates, I understand it is pulling
 # functions from above - but I don't understand why you use: if __name__ == '__main__':
+# This is step by step start with request_band_extract then comment out, then uncomment randomforest
+# and so forth
+# request_band_extract OUTPUT MUST BE MANUALLY DOWNLOADED FROM GCLOUD
+# prep extracts needs to be manually uploaded to GEE
 if __name__ == '__main__':
+    is_authorized()
     points = 'users/mariejohnson22/inference/random_points'
     years_ = [2019]
-    pref = 'bands_10JAN2023' # file prefix
+    pref = 'bands_10JAN2023_Water' # file prefix
     roi = 'users/mariejohnson22/inference/mission_no_fire'
-    request_band_extract(pref, points, roi, years_)
+    # request_band_extract(pref, points, roi, years_) # comment out after running
 
-    # I THINK THIS IS THE MAIN AREA OF CONFUSION - HOW WAS THIS GENERATED - QGIS?
-    csv = '/home/marie/crazyHorse/gedi/extracts/bands_10JAN2023_2019.csv'
-    random_forest(csv, show_importance=True)
+    # THIS MUST BE MANUALLY DOWNLOADED FROM GCLOUD
+    csv = '/home/marie/crazyHorse/gedi/extracts/bands_10JAN2023_Water_2019.csv'
+    # random_forest(csv, show_importance=True)
 
-    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_10JAN2023_2019.csv'
-    prep_extracts(csv, out_csv)
+    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_10JAN2023_Water_2019.csv'
+    # prep_extracts(csv, out_csv) # manually upload GEE - IS THIS TRAINING DATA?
 
-    training_data = 'users/mariejohnson22/inference/training_data'
-    image_coll = 'users/mariejohnson22/inference/canopy_height'
-    clip = 'users/mariejohnson22/inference/mission_no_fire'
-    out_img = 'canopy_height_base_10JAN2023'
+    # Final steps
+    # MAKE SURE PREPPED DATA HAVE BEEN UPLOADED TO GEE
+    training_data = 'users/mariejohnson22/inference/prepped_10JAN2023_Water_2019' # I assume this is being generated for the missions unburned
+    # I think I have to create this image collection manually on EE
+    # image_coll = 'users/mariejohnson22/inference/canopy_height'  # if you want a different image collection you need to create one on EE
+    image_coll = 'users/mariejohnson22/inference/canopy_height_water_included'
+    # is clip how I get the burned area by changing the shapefile?
+    # clip = 'users/mariejohnson22/inference/mission_no_fire' # shapefile of the missions without the burn
+    clip = 'users/mariejohnson22/inference/wild_ch' # shapefile of the crazy horse fire
+
+    out_img = 'canopy_height_crazy_horse_water_10JAN2023' # I don't know what this represents, I assume the predicted height for fire
     export_prediction(out_img, training_data, image_coll, clip, [2019])
 # ========================= EOF =================================================
