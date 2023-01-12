@@ -24,7 +24,7 @@ def prep_extracts(c, out_c): # features, dropna
     print(os.path.basename(c))
     df = pd.read_csv(c)
     print(df.shape)
-    df.dropna(inplace=True)
+    # df.dropna(inplace=True)
     d = ['system:index', '.geo', 'id']
     target = ['b1']
     selected_features = ['aspect',
@@ -287,7 +287,7 @@ def stack_bands(yr, roi):
 
     gedi = ee.Image('users/potapovpeter/GEDI_V27/GEDI_NAM_v27')
 
-    input_bands = input_bands.addBands([awc, clay, ksat, sand, gedi])
+    input_bands = input_bands.addBands([awc, clay, ksat, sand, gedi, water])
     input_bands = input_bands.clip(roi)
     return input_bands
 
@@ -309,29 +309,28 @@ def is_authorized():
 # prep extracts needs to be manually uploaded to GEE
 if __name__ == '__main__':
     is_authorized()
-    points = 'users/mariejohnson22/inference/random_points'
+    points = 'users/mariejohnson22/inference/random_points_40k' # upload to GEE prior to running
     years_ = [2019]
-    pref = 'bands_10JAN2023_Water' # file prefix
-    roi = 'users/mariejohnson22/inference/mission_no_fire'
+    pref = 'bands_11JAN2023_40k' # file prefix - change date
+    roi = 'users/mariejohnson22/inference/mission_no_fire' # don't change
     # request_band_extract(pref, points, roi, years_) # comment out after running
 
-    # THIS MUST BE MANUALLY DOWNLOADED FROM GCLOUD
-    csv = '/home/marie/crazyHorse/gedi/extracts/bands_10JAN2023_Water_2019.csv'
+    # THIS MUST BE MANUALLY DOWNLOADED FROM GCLOUD BEFORE RUNNING RANDOM FOREST
+    csv = '/home/marie/crazyHorse/gedi/extracts/bands_11JAN2023_40k_2019.csv' # change date
     # random_forest(csv, show_importance=True)
 
-    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_10JAN2023_Water_2019.csv'
-    # prep_extracts(csv, out_csv) # manually upload GEE - IS THIS TRAINING DATA?
+    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_11JAN2023_2019_40k.csv'
+    # prep_extracts(csv, out_csv)
 
-    # Final steps
     # MAKE SURE PREPPED DATA HAVE BEEN UPLOADED TO GEE
-    training_data = 'users/mariejohnson22/inference/prepped_10JAN2023_Water_2019' # I assume this is being generated for the missions unburned
-    # I think I have to create this image collection manually on EE
-    # image_coll = 'users/mariejohnson22/inference/canopy_height'  # if you want a different image collection you need to create one on EE
-    image_coll = 'users/mariejohnson22/inference/canopy_height_water_included'
-    # is clip how I get the burned area by changing the shapefile?
+    training_data = 'users/mariejohnson22/inference/prepped_11JAN2023_2019_40k' #  generated for the missions unburned? YES
+    # I think I have to create this image collection manually on EE (yes)
+    image_coll = 'users/mariejohnson22/inference/canopy_height_keep_zero_keep_water_40k'
+    # is clip how I get the burned area by changing the shapefile? - YES
     # clip = 'users/mariejohnson22/inference/mission_no_fire' # shapefile of the missions without the burn
     clip = 'users/mariejohnson22/inference/wild_ch' # shapefile of the crazy horse fire
 
-    out_img = 'canopy_height_crazy_horse_water_10JAN2023' # I don't know what this represents, I assume the predicted height for fire
+    # out_img = 'canopy_height_mission_no_fire_11JAN2023_2019' # predicted height (either burned or unburned depending on what you put for clipped
+    out_img = 'canopy_height_crazy_horse_11JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
     export_prediction(out_img, training_data, image_coll, clip, [2019])
 # ========================= EOF =================================================
