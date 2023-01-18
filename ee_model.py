@@ -24,7 +24,7 @@ def prep_extracts(c, out_c): # features, dropna
     print(os.path.basename(c))
     df = pd.read_csv(c)
     print(df.shape)
-    # df.dropna(inplace=True)
+    df.dropna(inplace=True)
     d = ['system:index', '.geo', 'id']
     target = ['b1']
     selected_features = ['aspect',
@@ -39,14 +39,14 @@ def prep_extracts(c, out_c): # features, dropna
                          'tpi_250']
     df.drop(columns=d, inplace=True)
     df = df[target + selected_features]
-    df = df[df['b1'] > 0]
+    # df = df[df['b1'] > 0]
     print(df.shape)
     df.to_csv(out_c, index=False)
 
 
 def random_forest(csv, n_estimators=150, out_shape=None, show_importance=False):
     df = read_csv(csv, engine='python').sample(frac=1.0).reset_index(drop=True)
-    df = df.loc[df['b1'] > 0]
+    # df = df.loc[df['b1'] > 0]
     split = int(df.shape[0] * 0.7)
     train = deepcopy(df.loc[:split, :])
     val = deepcopy(df.loc[split:, :])
@@ -309,28 +309,28 @@ def is_authorized():
 # prep extracts needs to be manually uploaded to GEE
 if __name__ == '__main__':
     is_authorized()
-    points = 'users/mariejohnson22/inference/random_points_40k' # upload to GEE prior to running
+    points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k' # upload to GEE prior to running
     years_ = [2019]
-    pref = 'bands_11JAN2023_40k' # file prefix - change date
-    roi = 'users/mariejohnson22/inference/mission_no_fire' # don't change
+    pref = 'bands_17JAN2023_40k' # file prefix - change date
+    roi = 'projects/ee-mariejohnson/assets/gedi/inference/missionsNoFire' # don't change
     # request_band_extract(pref, points, roi, years_) # comment out after running
 
     # THIS MUST BE MANUALLY DOWNLOADED FROM GCLOUD BEFORE RUNNING RANDOM FOREST
-    csv = '/home/marie/crazyHorse/gedi/extracts/bands_11JAN2023_40k_2019.csv' # change date
-    # random_forest(csv, show_importance=True)
+    csv = '/home/marie/EcoRes/GEDI/extracts/bands_17JAN2023_40k_2019.csv' # change date
+    # random_forest(csv, show_importance=True) # Is this just see results locally?
 
-    out_csv = '/home/marie/crazyHorse/gedi/extracts/prepped_11JAN2023_2019_40k.csv'
+    out_csv = '/home/marie/EcoRes/GEDI/extracts/prepped_17JAN2023_2019_40k.csv'
     # prep_extracts(csv, out_csv)
 
     # MAKE SURE PREPPED DATA HAVE BEEN UPLOADED TO GEE
-    training_data = 'users/mariejohnson22/inference/prepped_11JAN2023_2019_40k' #  generated for the missions unburned? YES
+    training_data = 'projects/ee-mariejohnson/assets/gedi/inference/prepped_17JAN2023_2019_40k' #  generated for the missions unburned? YES projects/ee-mariejohnson/assets/gedi/inference
     # I think I have to create this image collection manually on EE (yes)
-    image_coll = 'users/mariejohnson22/inference/canopy_height_keep_zero_keep_water_40k'
+    image_coll = 'projects/ee-mariejohnson/assets/gedi/inference/canopy_height_17JAN2023'
     # is clip how I get the burned area by changing the shapefile? - YES
     # clip = 'users/mariejohnson22/inference/mission_no_fire' # shapefile of the missions without the burn
-    clip = 'users/mariejohnson22/inference/wild_ch' # shapefile of the crazy horse fire
+    clip = 'projects/ee-mariejohnson/assets/gedi/inference/wildCH' # shapefile of the crazy horse fire
 
-    # out_img = 'canopy_height_mission_no_fire_11JAN2023_2019' # predicted height (either burned or unburned depending on what you put for clipped
-    out_img = 'canopy_height_crazy_horse_11JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
+    # out_img = 'canopy_height_mission_no_fire_17JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
+    out_img = 'canopy_height_crazy_horse_17JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
     export_prediction(out_img, training_data, image_coll, clip, [2019])
 # ========================= EOF =================================================
