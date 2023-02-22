@@ -34,10 +34,20 @@ def filter_shp(shape, out):
     df = df[['Name', 'Date', 'geometry']]
     df['Date'] = [pd.to_datetime(x) for x in df['Date']]
     df.index = df['Name']
-    for month in range(4, 11):
+    for month in range(1, 12):
         matches = [i for i, r in df.iterrows() if r['Date'].month == month]
         mdf = df.loc[matches, ['Name', 'Date', 'geometry']].copy()
-        mdf.to_file()
+        mdf.to_csv(out)
+
+def filter_date(shape, out): # This really isn't a filter it's just all the flights regardless of month
+    df = gpd.read_file(shape)
+    df = df[['Name', 'Date']]
+    df['Date'] = [pd.to_datetime(x) for x in df['Date']]
+    df.index = df['Name']
+    for month in range(1, 12):
+        matches = [i for i, r in df.iterrows() if r['Date'].month == month]
+        mdf = df.loc[matches, ['Name', 'Date']].copy()
+        mdf.to_csv(out)
 
 if __name__ == '__main__':
     c = '/home/marie/alisal/aviris/data/aviris_flights_2006_2021.csv'
@@ -49,6 +59,12 @@ if __name__ == '__main__':
 '/home/marie/alisal/aviris/data/burns/caveGeo.shp'] # Cave fire
     # clip_files(all_flights, clips, '/home/marie/alisal/aviris/data')
 
-    shp = '/home/marie/alisal/aviris/data/1.shp'
-    oshp = '/home/marie/alisal/aviris/data'
-    filter_shp(shp, oshp)
+    # shp = '/home/marie/alisal/aviris/data/1.shp' # Cave fire
+    shp = '/home/marie/alisal/aviris/data/0.shp' # Alisal
+    # oshp = '/home/marie/alisal/aviris/data'
+    # icsv = '/home/marie/alisal/aviris/data/intersect_cave.csv' # matches exact geometry intersection
+    icsv = '/home/marie/alisal/aviris/data/intersect_alisal.csv'  # matches exact geometry intersection
+    # date_csv = '/home/marie/alisal/aviris/data/any_cave.csv'
+    filter_shp(shp, icsv)# Matches exact geometry intersection
+    # filter_date(shp, date_csv) # this is just all flights within the cave fire, I can also just covert the shapefile to df in R
+
