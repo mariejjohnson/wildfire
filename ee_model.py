@@ -307,30 +307,34 @@ def is_authorized():
 # and so forth
 # request_band_extract OUTPUT MUST BE MANUALLY DOWNLOADED FROM GCLOUD
 # prep extracts needs to be manually uploaded to GEE
+# Last run was 17JAN2023 prior to Nov 7th run
 if __name__ == '__main__':
     is_authorized()
     points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k' # upload to GEE prior to running
     years_ = [2019]
-    pref = 'bands_17JAN2023_40k' # file prefix - change date
+    pref = 'bands_07NOV2023_40k_R1' # file prefix - change date
     roi = 'projects/ee-mariejohnson/assets/gedi/inference/missionsNoFire' # don't change
-    # request_band_extract(pref, points, roi, years_) # comment out after running
+    # Extracts bands of the points that is was given (40k in this case)
+    request_band_extract(pref, points, roi, years_) # comment out after running
 
     # THIS MUST BE MANUALLY DOWNLOADED FROM GCLOUD BEFORE RUNNING RANDOM FOREST
-    csv = '/home/marie/EcoRes/GEDI/extracts/bands_17JAN2023_40k_2019.csv' # change date
+    # comment out
+    # csv = '/home/marie/EcoRes/GEDI/extracts/bands_07NOV2023_40k_2019.csv' # change date
+    # The actual random forest classifier based on the points/data given above
     # random_forest(csv, show_importance=True) # Is this just see results locally?
 
-    out_csv = '/home/marie/EcoRes/GEDI/extracts/prepped_17JAN2023_2019_40k.csv'
+    # out_csv = '/home/marie/EcoRes/GEDI/extracts/prepped_07NOV2023_2019_40k.csv'
     # prep_extracts(csv, out_csv)
 
     # MAKE SURE PREPPED DATA HAVE BEEN UPLOADED TO GEE
-    training_data = 'projects/ee-mariejohnson/assets/gedi/inference/prepped_17JAN2023_2019_40k' #  generated for the missions unburned? YES projects/ee-mariejohnson/assets/gedi/inference
+    # training_data = 'projects/ee-mariejohnson/assets/gedi/inference/prepped_07NOV2023_2019_40k' #  generated for the missions unburned? YES projects/ee-mariejohnson/assets/gedi/inference
     # I think I have to create this image collection manually on EE (yes)
-    image_coll = 'projects/ee-mariejohnson/assets/gedi/inference/canopy_height_17JAN2023'
+    # image_coll = 'projects/ee-mariejohnson/assets/gedi/inference/canopy_height_07NOV2023'
     # is clip how I get the burned area by changing the shapefile? - YES
     # clip = 'users/mariejohnson22/inference/mission_no_fire' # shapefile of the missions without the burn
-    clip = 'projects/ee-mariejohnson/assets/gedi/inference/wildCH' # shapefile of the crazy horse fire
+    # clip = 'projects/ee-mariejohnson/assets/gedi/inference/wildCH' # shapefile of the crazy horse fire
 
-    # out_img = 'canopy_height_mission_no_fire_17JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
-    out_img = 'canopy_height_crazy_horse_17JAN2023' # predicted height (either burned or unburned depending on what you put for clipped
-    export_prediction(out_img, training_data, image_coll, clip, [2019])
+    # out_img = 'canopy_height_mission_no_fire_07NOV2023' # predicted height (either burned or unburned depending on what you put for clipped
+    # out_img = 'canopy_height_crazy_horse_07NOV2023' # predicted height (either burned or unburned depending on what you put for clipped
+    # export_prediction(out_img, training_data, image_coll, clip, [2019])
 # ========================= EOF =================================================
