@@ -310,43 +310,43 @@ def is_authorized():
 # Last run was 17JAN2023 prior to Nov 7th run
 if __name__ == '__main__':
     is_authorized()
-    # points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k' # upload to GEE prior to running
+    # I'm re-using the original random points from the first run so all processing will be done the same way with november runs
+    # this should technically have _1 on it but it's already uploaded
+    points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k' # upload to GEE prior to running
     # Step 1: change names: random points (will be one number ahead), run number, date (if applicable)
-    # New step 1: just change run number
     # points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k_6'  # New set of random points - this where you left off
     # points = 'projects/ee-mariejohnson/assets/gedi/inference/random_points_40k_10'  # New set of random points
     years_ = [2019]
-    # pref = 'bands_15NOV2023_40k_R9' # file prefix - this is where you left off
-    # pref = 'bands_15NOV2023_40k_R9' # file prefix
+    pref = 'bands_15NOV2023_40k_R10' # file prefix
 
     roi = 'projects/ee-mariejohnson/assets/gedi/inference/missionsNoFire' # don't change
     # Extracts bands of the points that is was given (40k in this case)
-    # Step 2: (you can skip now that you have done all 10)Make sure all other functions are commented out, then run this function
+    # Step 2: Make sure all other functions are commented out, then run this function
     # request_band_extract(pref, points, roi, years_) # comment out after running - do I need to run this each time? Yes when changing the random points file
 
-    # Step 3: DONE skip to 4. manually download from GCLOUD BEFORE RUNNING RANDOM FOREST
+    # Step 3: manually download from GCLOUD BEFORE RUNNING RANDOM FOREST
     # comment out
-    csv = '/home/marie/EcoRes/GEDI/extracts/bands_15NOV2023_40k_R9_2019.csv' # change date
+    csv = '/home/marie/EcoRes/GEDI/extracts/bands_15NOV2023_40k_R10_2019.csv' # change date
     # The actual random forest classifier based on the points/data given above
     # Step 4:
     # random_forest(csv, show_importance=True) # Is this just see results locally?
 
-    out_csv = '/home/marie/EcoRes/GEDI/extracts/prepped_15NOV2023_2019_40k_R9.csv'
+    out_csv = '/home/marie/EcoRes/GEDI/extracts/prepped_15NOV2023_2019_40k_R10.csv'
     # Step 5:
     # prep_extracts(csv, out_csv)
 
     # Step 6: upload prepped data to GEE
     # Step 7: create new image collection on GEE
     # Step 8: uncomment: change clip (missions vs burned), change out image
-    training_data = 'projects/ee-mariejohnson/assets/gedi/inference/prepped_15NOV2023_2019_40k_R9' #  generated for the missions unburned? YES projects/ee-mariejohnson/assets/gedi/inference
+    training_data = 'projects/ee-mariejohnson/assets/gedi/inference/prepped_15NOV2023_2019_40k_R10' #  generated for the missions unburned? YES projects/ee-mariejohnson/assets/gedi/inference
     # I think I have to create this image collection manually on EE (yes)
-    image_coll = 'projects/ee-mariejohnson/assets/gedi/inference/canopy_height_15NOV2023_R9'
+    image_coll = 'projects/ee-mariejohnson/assets/gedi/inference/canopy_height_15NOV2023_R10'
     # is clip how I get the burned area by changing the shapefile? - YES
     # clip = 'users/mariejohnson22/inference/mission_no_fire' # shapefile of the missions without the burn
     clip = 'projects/ee-mariejohnson/assets/gedi/inference/wildCH' # shapefile of the crazy horse fire
 
-    # out_img = 'canopy_height_mission_no_fire_15NOV2023_R9' # predicted height (either burned or unburned depending on what you put for clipped
-    out_img = 'canopy_height_crazy_horse_15NOV2023_R9' # predicted height (either burned or unburned depending on what you put for clipped
+    # out_img = 'canopy_height_mission_no_fire_15NOV2023_R10' # predicted height (either burned or unburned depending on what you put for clipped
+    out_img = 'canopy_height_crazy_horse_15NOV2023_R10' # predicted height (either burned or unburned depending on what you put for clipped
     # Step 9:
     export_prediction(out_img, training_data, image_coll, clip, [2019])
     # Step 10: Re-run export prediction for crazy horse
