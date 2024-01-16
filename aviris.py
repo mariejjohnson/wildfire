@@ -65,7 +65,7 @@ if __name__ == '__main__':
 
 #     clips = ['/home/marie/alisal/aviris/data/burns/ca3451712013120211011_20211003_20211122_burn_bndy_rprj.shp', # Alisal
 # '/home/marie/alisal/aviris/data/burns/caveGeo.shp'] # Cave fire
-    clips = ['/home/marie/alisal/aviris/data/burns/ca3451712013120211011_20211003_20211122_burn_bndy_rprj.shp']  # Jesusita fire
+    clips = ['/media/marie/Data01/data/MTBS/jesusita/mtbs/2009/ca3447411972520090505_20080623_20100613_burn_bndy_rprj.shp']  # Jesusita fire
     # clip_files(all_flights, clips, '/home/marie/alisal/aviris/data/jesusita') # insections of the fire chosen
 
     # shp = '/home/marie/alisal/aviris/data/1.shp' # Cave fire
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     # icsv = '/home/marie/alisal/aviris/data/intersect_alisal.csv'  # matches exact geometry intersection
     # date_csv = '/home/marie/alisal/aviris/data/any_cave.csv'
 
-    filter_shp(shp, icsv)# Matches exact geometry intersection
+    # filter_shp(shp, icsv)# Matches exact geometry intersection
 
     # filter_date(shp, date_csv) # this is just all flights within the cave fire, I can also just covert the shapefile to df in R
 
